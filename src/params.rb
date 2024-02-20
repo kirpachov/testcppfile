@@ -22,6 +22,7 @@ class Params < ActiveInteraction::Base
       output_file:,
       verbose:,
       watch:,
+      development:,
     )
   end
 
@@ -50,9 +51,22 @@ class Params < ActiveInteraction::Base
       parser.on("-w", "--watch", "Watch for file changes") do |lib|
         @argv_hash[:watch] = true
       end
+
+      parser.on("-d", "--development", "Development mode. Will stop execution at first failed test and print diffs.") do |lib|
+        @argv_hash[:development] = true
+      end
+
     end.parse!(argv)
 
     @argv_hash
+  end
+
+  def development?
+    argv_hash[:development] == true
+  end
+
+  def development
+    development?
   end
 
   def compile_options
@@ -143,7 +157,20 @@ class Params < ActiveInteraction::Base
 
         [input, matching]
       end
+    elsif File.directory?("#{base_dir}/input") && File.directory?("#{base_dir}/output")
+      outputs = Dir.glob("#{base_dir}/output/*").sort
+
+      return @inputs_outputs = Dir.glob("#{base_dir}/input/*").sort!.map do |input|
+        matching = outputs.filter { |output| output.match?(/#{File.basename(input.gsub('input', ''))}/) }.first
+
+        matching = outputs.first if matching.nil?
+
+        outputs = outputs.filter { |output| output != matching }
+
+        [input, matching]
+      end
     end
+
     @inputs_outputs = Dir.glob("#{base_dir}/**/**").filter { |file| file.match?(/input/) }.map do |input|
       output = input.gsub('input', 'output')
       [input, output]

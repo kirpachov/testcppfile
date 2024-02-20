@@ -29,13 +29,16 @@ class ExecuteAll < ActiveInteraction::Base
       end
 
       diff_path = Execute.run!(executable_path:, input_path:, output_path:)
-      puts "Diff: #{diff_path}" if diff_path.present?
 
-      {
-        diff_path: diff_path,
-        input_path: input_path,
-        output_path: output_path,
-      }
+      if params.development? && diff_path.present?
+        puts "FAILED: #{diff_path}"
+        puts File.read(diff_path)
+
+        return [{ diff_path:, input_path:, output_path: }]
+      end
+
+        puts "Diff: #{diff_path}" if diff_path.present?
+      { diff_path:,  input_path:,  output_path: }
     end
   end
 end

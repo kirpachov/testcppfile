@@ -18,11 +18,11 @@ Script to test a cpp file with multiple inputs and outputs.
     │   └── logic.cpp         # File to compile and test for each input and output
     └── ...
 
-## Getting started
+## Installation
 
-Give the file permissions to execute.
+Give the file permissions to execute and create a symbolic link to the file in /usr/bin.
 ```bash
-chmod +x testcppfile.rb
+chmod +x testcppfile.rb && sudo ln -s "$(pwd)/testcppfile.rb" /usr/bin/testcppfile
 ```
 
 ## Usage example

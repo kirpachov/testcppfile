@@ -1,9 +1,8 @@
-# Test cpp file
+# Competitive Programming fast test
 
-Script to test a cpp file with multiple inputs and outputs.
+This is a simple script to test a competitive programming solution with multiple inputs and outputs.
 
-> Note: Runs only on Linux, requires g++ and ruby.
-
+## Project structure
     .
     ├── ...
     ├── project_dir            # Root of the project
@@ -19,19 +18,20 @@ Script to test a cpp file with multiple inputs and outputs.
     └── ...
 
 ## Installation
-
-Give the file permissions to execute and create a symbolic link to the file in /usr/bin.
 ```bash
+# Clone the repository
+# Enter the repository folder
 chmod +x testcppfile.rb && sudo ln -s "$(pwd)/testcppfile.rb" /usr/bin/testcppfile
 ```
 
-## Usage example
-
+## Usage
 ```bash
-./testcppfile.rb spec/fixtures/donothing/donothing.cpp -w
-```
+# Compile and run the logic.cpp file with each input and compare the output with the expected output
+./testcppfile project_dir/logic.cpp project_dir/inputs project_dir/outputs
 
-## Options
-```bash
-./testcppfile.rb -h
+# Compile and run the logic.cpp file with a single input and compare the output with the expected output
+./testcppfile project_dir/logic.cpp project_dir/input.txt project_dir/output.txt
+
+# Compile the logic.cpp file with options for the g++ compiler
+./testcppfile project_dir/logic.cpp project_dir/inputs project_dir/outputs -c "-O2 -std=c++17"
 ```

@@ -9,26 +9,26 @@ require 'active_interaction'
 require 'optionparser'
 require 'filewatcher'
 
-require_relative 'src/params'
-Dir.glob('src/*.rb').each { |file| require_relative file }
+require_relative 'src/options'
+Dir.glob('src/*.rb').each do|file|
+  require_relative file
+end
 
-params = Params.run(argv: ARGV, configs: { wd: PWD })
+options = Options.run(argv: ARGV, settings: { wd: PWD })
 
-raise params.errors.full_messages.join("\n") if params.invalid?
+puts options.to_h
 
-PrintParams.run!(params: params, wd: PWD) if params.verbose?
+ValidateOptions.run!(options:)
 
-ExecuteAll.run!(params:)
+executable = Build.run!(options:)
 
-if params.watch?
+RunAll.run!(options:, executable:)
+
+if options.watch?
   puts "Watching..."
 
-  Filewatcher.new([
-                    "#{params.base_dir}/**/*.cpp",
-                    "#{params.base_dir}/**/*.hpp",
-                    params.cpp_file,
-                    *params.inputs_outputs.flatten.uniq,
-                  ]).watch do |_changes|
-    ExecuteAll.run!(params:)
+  Filewatcher.new(options.files_to_watch).watch do |_changes|
+    executable = Build.run!(options:)
+    RunAll.run!(options:, executable:)
   end
 end

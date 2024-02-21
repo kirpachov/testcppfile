@@ -4,7 +4,9 @@
 PWD = Dir.pwd.dup.freeze
 Dir.chdir __dir__
 
-require 'byebug'
+DEVELOPMENT = ENV['DEVELOPMENT'] == 'true'
+
+require 'byebug' if DEVELOPMENT
 require 'active_interaction'
 require 'optionparser'
 require 'filewatcher'
@@ -16,7 +18,7 @@ end
 
 options = Options.run(argv: ARGV, settings: { wd: PWD })
 
-puts options.to_h
+puts options.to_h if options.verbose? || DEVELOPMENT
 
 ValidateOptions.run!(options:)
 

@@ -13,7 +13,7 @@ require 'filewatcher'
 require 'fileutils'
 
 require_relative 'src/options'
-Dir.glob('src/*.rb').each do|file|
+Dir.glob('src/*.rb').each do |file|
   require_relative file
 end
 
@@ -23,15 +23,23 @@ puts options.to_h if options.verbose? || DEVELOPMENT
 
 ValidateOptions.run!(options:)
 
-executable = Build.run!(options:)
+def build_and_run(options:, first: true)
+  msg = '-' * 20 + " #{Time.now.strftime('%k:%M:%S')} " + '-' * 20
+  puts "\n" * 3 unless first
+  puts '-' * msg.length
+  puts msg
+  puts '-' * msg.length
+  executable = Build.run!(options:)
 
-RunAll.run!(options:, executable:)
+  RunAll.run!(options:, executable:) if executable
+end
+
+build_and_run(options:)
 
 if options.watch?
   puts "Watching..."
 
   Filewatcher.new(options.files_to_watch).watch do |_changes|
-    executable = Build.run!(options:)
-    RunAll.run!(options:, executable:)
+    build_and_run(options:, first: false)
   end
 end

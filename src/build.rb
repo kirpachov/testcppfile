@@ -12,6 +12,8 @@ class Build < ActiveInteraction::Base
     puts command if options.verbose?
     system command
 
+    return nil if $?.exitstatus != 0
+
     executable
   end
 

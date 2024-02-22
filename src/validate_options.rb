@@ -11,11 +11,22 @@ class ValidateOptions < ActiveInteraction::Base
     validate_inputs_outputs_match
     validate_inputs_presence
     validate_outputs_presence
+    validate_tmp_dir
 
     if errors.any?
       puts errors.full_messages.join("\n")
       exit
     end
+  end
+
+  def validate_tmp_dir
+    tmp_dir = options.tmp_dir
+    return errors.add(:tmp_dir, "should be a directory. Got a file.") if File.file?(tmp_dir)
+
+    FileUtils.mkdir_p(tmp_dir) unless Dir.exist?(tmp_dir)
+    return if Dir.glob("#{tmp_dir}/*").empty?
+
+    errors.add(:tmp_dir, "should be empty. Got #{Dir.glob("#{tmp_dir}/*").join(', ')}")
   end
 
   def validate_inputs_presence

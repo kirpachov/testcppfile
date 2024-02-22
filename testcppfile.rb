@@ -10,6 +10,7 @@ require 'byebug' if DEVELOPMENT
 require 'active_interaction'
 require 'optionparser'
 require 'filewatcher'
+require 'fileutils'
 
 require_relative 'src/options'
 Dir.glob('src/*.rb').each do|file|

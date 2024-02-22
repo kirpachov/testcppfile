@@ -5,14 +5,15 @@ class RunAll < ActiveInteraction::Base
   string :executable
 
   def execute
-    tmp_dir = "#{options.wd}/tmp"
+    tmp_dir = options.tmp_dir
+
     if Dir.exist?(tmp_dir)
       system("rm -rf #{tmp_dir}/*")
     else
       Dir.mkdir(tmp_dir)
     end
 
-    AssociateInputOutput.run!(options:).each do |input_file, expected_output_file|
+    results = AssociateInputOutput.run!(options:).map do |input_file, expected_output_file|
       puts "Processing #{input_file}..."
 
       secret = SecureRandom.hex
@@ -31,9 +32,16 @@ class RunAll < ActiveInteraction::Base
 
       if $?.exitstatus != 0
         puts "Test failed. See #{diff_file} for details."
-      else
-        puts "Test passed."
+        next false
       end
+
+      true
+    end
+
+    if results.all?
+      puts "All tests passed."
+    else
+      puts "#{results.filter { |j| !j }.length} tests failed."
     end
   end
 end

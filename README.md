@@ -55,3 +55,15 @@ testcppfile project_dir/logic.cpp project_dir/inputs project_dir/outputs -c "-O2
 ```bash
 testcppfile logic.cpp inputs outputs -w
 ```
+After first execution, will watch for changes in:
+- Inputs
+- Outputs
+- Logic file (.cpp)
+- Header files (.hpp)
+
+### Tmp folder
+```bash
+testcppfile logic.cpp inputs outputs -t some-folder
+```
+Diff files will be saved in a tmp folder.
+You can select the tmp folder with the `-t` option.

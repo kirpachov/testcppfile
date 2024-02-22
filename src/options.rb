@@ -20,6 +20,7 @@ class Options < ActiveInteraction::Base
       inputs_path:,
       outputs_path:,
       wd:,
+      tmp_dir:,
     )
   end
 
@@ -30,6 +31,22 @@ class Options < ActiveInteraction::Base
       *inputs_path,
       *outputs_path,
     ]
+  end
+
+  def tmp_dir
+    "#{tmp_base_dir}/testcppfile-#{fixed_secret}"
+  end
+
+  def tmp_base_dir
+    return "/tmp/testcppfile" if argv_hash[:tmp_dir].to_s.blank?
+
+    return "#{wd}/#{argv_hash[:tmp_dir]}" if argv_hash[:tmp_dir][0] != '/'
+
+    argv_hash[:tmp_dir]
+  end
+
+  def fixed_secret
+    @fixed_secret ||= SecureRandom.hex
   end
 
   def cpp_file_dir
@@ -62,7 +79,6 @@ class Options < ActiveInteraction::Base
 
   def inputs_path
     return [] if argv[1].nil?
-    # return [argv[1]] if File.file?(argv[1])
     return ["#{wd}/#{argv[1]}"] if File.file?("#{wd}/#{argv[1]}")
 
     Dir.glob("#{wd}/#{argv[1]}/*")
@@ -70,7 +86,6 @@ class Options < ActiveInteraction::Base
 
   def outputs_path
     return [] if argv[2].nil?
-    # return [argv[2]] if File.file?(argv[2])
     return ["#{wd}/#{argv[2]}"] if File.file?("#{wd}/#{argv[2]}")
 
     Dir.glob("#{wd}/#{argv[2]}/*")
@@ -108,6 +123,10 @@ class Options < ActiveInteraction::Base
       parser.on("-h", "--help", "Prints this help") do
         puts parser
         exit
+      end
+
+      parser.on('-t TMP_DIR', '--tmp-dir TMP_DIR', "Set the tmp dir. Default is /tmp/") do |lib|
+        @argv_hash[:tmp_dir] = lib
       end
     end.parse!(argv)
 
